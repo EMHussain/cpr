@@ -77,6 +77,7 @@ class Session {
 
     // Used in templated functions
     void SetOption(const Url& url);
+    void SetOption(const std::vector<Url> url);
     void SetOption(const Parameters& parameters);
     void SetOption(Parameters&& parameters);
     void SetOption(const Header& header);
@@ -118,6 +119,7 @@ class Session {
     Response Download(const WriteCallback& write);
     Response Download(std::ofstream& file);
     Response Get();
+    Response GetMulti();
     Response Head();
     Response Options();
     Response Patch();
@@ -128,6 +130,7 @@ class Session {
 
     void PrepareDelete();
     void PrepareGet();
+    void PrepareGetMulti();
     void PrepareHead();
     void PrepareOptions();
     void PreparePatch();

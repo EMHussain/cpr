@@ -46,6 +46,12 @@ AsyncResponse GetAsync(Ts... ts) {
     return std::async(
             std::launch::async, [](Ts... ts) { return Get(std::move(ts)...); }, std::move(ts)...);
 }
+template <typename... Ts>
+Response GetMulti(Ts... ts){
+    Session session;
+    priv::set_option(session, std::forward<Ts>(ts)...);
+    return session.GetMulti();
+}
 
 // Get callback methods
 template <typename Then, typename... Ts>

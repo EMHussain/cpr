@@ -26,6 +26,7 @@ class Session::Impl {
     Impl();
 
     void SetUrl(const Url& url);
+    void SetUrl(const std::vector<Url> urlList);
     void SetParameters(const Parameters& parameters);
     void SetParameters(Parameters&& parameters);
     void SetHeader(const Header& header);
@@ -68,6 +69,7 @@ class Session::Impl {
     Response Download(const WriteCallback& write);
     Response Download(std::ofstream& file);
     Response Get();
+    Response GetMulti();
     Response Head();
     Response Options();
     Response Patch();
@@ -78,6 +80,7 @@ class Session::Impl {
 
     void PrepareDelete();
     void PrepareGet();
+    void PrepareGetMulti();
     void PrepareHead();
     void PrepareOptions();
     void PreparePatch();
@@ -91,6 +94,7 @@ class Session::Impl {
 
     std::shared_ptr<CurlHolder> curl_;
     Url url_;
+    std::vector<Url> urlLi_;
     Parameters parameters_;
     Proxies proxies_;
     Header header_;
@@ -110,6 +114,7 @@ class Session::Impl {
 
     Response makeDownloadRequest();
     Response makeRequest();
+    Response makeMultiRequest();
     void prepareCommon();
 };
 
@@ -138,6 +143,9 @@ Session::Impl::Impl() : curl_(new CurlHolder()) {
 
 void Session::Impl::SetUrl(const Url& url) {
     url_ = url;
+}
+void Session::Impl::SetUrl(const std::vector<Url> urlList) {
+    urlLi_ = urlList;
 }
 
 void Session::Impl::SetParameters(const Parameters& parameters) {
@@ -518,6 +526,14 @@ Response Session::Impl::Get() {
     PrepareGet();
     return makeRequest();
 }
+void Session::Impl::PrepareGetMulti() {
+    // curl_multi_perform prepare here
+}
+
+Response Session::Impl::GetMulti() {
+    PrepareGetMulti();
+    return makeMultiRequest();
+}
 
 void Session::Impl::PrepareHead() {
     curl_easy_setopt(curl_->handle, CURLOPT_NOBODY, 1L);
@@ -683,6 +699,12 @@ Response Session::Impl::makeRequest()
     CURLcode curl_error = curl_easy_perform(curl_->handle);
     return Complete(curl_error);
 }
+Response Session::Impl::makeMultiRequest()
+{
+    CURLcode curl_error;
+    // curl multiperform here
+    return Complete(curl_error);
+}
 
 Response Session::Impl::Complete(CURLcode curl_error)
 {
@@ -788,6 +810,7 @@ std::shared_ptr<CurlHolder> Session::GetCurlHolder() { return pimpl_->GetCurlHol
 
 void Session::PrepareDelete() { return pimpl_->PrepareDelete(); }
 void Session::PrepareGet() { return pimpl_->PrepareGet(); }
+void Session::PrepareGetMulti() { return pimpl_->PrepareGetMulti(); }
 void Session::PrepareHead() { return pimpl_->PrepareHead(); }
 void Session::PrepareOptions() { return pimpl_->PrepareOptions(); }
 void Session::PreparePatch() { return pimpl_->PreparePatch(); }
